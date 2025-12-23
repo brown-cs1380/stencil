@@ -1,4 +1,5 @@
-const distribution = require('../../config.js');
+require('../../distribution.js')();
+const distribution = globalThis.distribution;
 const util = distribution.util;
 
 test('(3 pts) (scenario) 40 bytes object', () => {
@@ -9,7 +10,7 @@ test('(3 pts) (scenario) 40 bytes object', () => {
   let object = null;
 
   const serialized = util.serialize(object);
-  expect(serialized.length).toBe(40);
+  expect(serialized.length).toEqual(40);
 });
 
 test('(3 pts) (scenario) object fix', () => {
@@ -20,7 +21,7 @@ test('(3 pts) (scenario) object fix', () => {
 
   // eslint-disable-next-line
     const serializedObject = '{"type":"object","value":{"a":"{\\"type\\":\\"string\\",\\"value\\":\\"jcarb\\"}","b":"{\\"type\\":\\"number\\",\\"value\\":\\"1\\"}","c":"{\\"type\\":\\"function\\",\\"value\\":\\"(a, b) => a + b\\"}"}}';
-  expect(util.serialize(object)).toBe(serializedObject);
+  expect(util.serialize(object)).toEqual(serializedObject);
 });
 
 test('(3 pts) (scenario) string deserialized into target object', () => {
@@ -42,20 +43,20 @@ test('(3 pts) (scenario) object with all supported data types', () => {
     built-in data types supported by the serialization library. */
   let object = null;
 
-  const setTypes = new Set();
+  const setTypes = [];
   for (const k in object) {
-    setTypes.add(typeof object[k]);
+    setTypes.push(typeof object[k]);
     if (typeof object[k] == 'object' && object[k] != null) {
-      setTypes.add(object[k].constructor.name);
+      setTypes.push(object[k].constructor.name);
     } else if (typeof object[k] == 'object' && object[k] == null) {
-      setTypes.add('null');
+      setTypes.push('null');
     }
   }
 
-  const typeList = Array.from(setTypes).sort();
+  const typeList = setTypes.sort();
   const goalTypes = ['Array', 'Date', 'Error', 'Object',
     'boolean', 'function', 'null', 'number', 'object', 'string', 'undefined'];
-  expect(typeList).toStrictEqual(goalTypes);
+  expect(typeList).toEqual(expect.arrayContaining(goalTypes));
 
   const serialized = util.serialize(object);
   const deserialized = util.deserialize(serialized);

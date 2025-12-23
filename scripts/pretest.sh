@@ -9,17 +9,11 @@ fi
 TOP_LEVEL=$(git rev-parse --show-toplevel)
 cd "$TOP_LEVEL" || exit 1
 
-# Check if node_modules exist in the current directory
-INSTALLATION_OK=0
-
 if [ ! -d "node_modules" ]; then
-    echo "[pretest] please run 'npm install' in the root directory of your project" >&2
-    INSTALLATION_OK=1
+    npm install
 fi
 
 if [ ! -d "non-distribution/node_modules" ]; then
-    echo "[pretest] please run 'npm install' in the 'non-distribution' folder" >&2
-    INSTALLATION_OK=1
+    cd non-distribution || exit 1
+    npm install
 fi
-
-exit $INSTALLATION_OK

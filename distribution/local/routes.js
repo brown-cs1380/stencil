@@ -1,8 +1,11 @@
-/** @typedef {import("../types").Callback} Callback */
+/**
+ * @typedef {import("../types").Callback} Callback
+ * @typedef {'comm' | 'groups' | 'status' | 'routes' | 'gossip' | 'mem' | 'store' | 'mr'} ServiceName
+ */
 
 
 /**
- * @param {string} configuration
+ * @param {ServiceName | {service: ServiceName, gid?: string}} configuration
  * @param {Callback} callback
  * @return {void}
  */
@@ -23,6 +26,6 @@ function put(service, configuration, callback) {
  * @param {Callback} callback
  */
 function rem(configuration, callback) {
-};
+}
 
 module.exports = {get, put, rem};

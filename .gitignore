@@ -1,3 +1,6 @@
+# macOS files
+.DS_Store
+
 node_modules
 package-lock.json
 
@@ -10,3 +13,4 @@ submission.zip
 
 dist
 stencil
+.npm-cache

@@ -1,19 +1,26 @@
 /**
  * Asynchronous callback function
  * @callback Callback
- * @param {(Error|Object.<any, Error>)} error
- * @param {any} [result=undefined]
+ * @param {Error | Object.<string, Error> | null} error
+ * @param {any} [result]
  * @returns {void}
- */
-
-/**
- * @typedef {Object} Node
- * @property {string} ip
- * @property {number} port
- */
-
-/**
- * @typedef {Object.<string, NodeInfo>} Group
+ *
+ * @typedef {{ip: string, port: number, onStart?: Callback, [key: string]: any}} Node
+ *
+ * @typedef {Object.<string, Node>} Group
+ *
+ * @typedef {!string} ID
+ * @typedef {!string} NID
+ * @typedef {!string} SID
+ *
+ * @typedef {(kid: ID, nids: NID[]) => NID} Hasher
+ *
+ * @typedef {(lst: any[]) => number} Sampler
+ *
+ * @typedef {Object} Config
+ * @property {?string} gid
+ * @property {Hasher} [hash]
+ * @property {Sampler} [subset]
  */
 
 module.exports = {};

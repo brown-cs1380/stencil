@@ -1,9 +1,14 @@
-/** @typedef {import("../types").Callback} Callback */
+// @ts-check
+/**
+ * @typedef {import("../types.js").Callback} Callback
+ * @typedef {import("../types.js").Config} Config
+ * @typedef {import("../util/id.js").NID} NID
+ */
 
 /**
  * Map functions used for mapreduce
  * @callback Mapper
- * @param {any} key
+ * @param {string} key
  * @param {any} value
  * @returns {object[]}
  */
@@ -11,8 +16,8 @@
 /**
  * Reduce functions used for mapreduce
  * @callback Reducer
- * @param {any} key
- * @param {Array} value
+ * @param {string} key
+ * @param {any[]} value
  * @returns {object}
  */
 
@@ -21,6 +26,9 @@
  * @property {Mapper} map
  * @property {Reducer} reduce
  * @property {string[]} keys
+ *
+ * @typedef {Object} Mr
+ * @property {(configuration: MRConfig, cb: Callback) => void} exec
  */
 
 
@@ -30,6 +38,10 @@
   installed on the remote nodes and not necessarily exposed to the user.
 */
 
+/**
+ * @param {Config} config
+ * @return {Mr}
+ */
 function mr(config) {
   const context = {
     gid: config.gid || 'all',
@@ -44,6 +56,6 @@ function mr(config) {
   }
 
   return {exec};
-};
+}
 
 module.exports = mr;

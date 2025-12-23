@@ -1,86 +1,65 @@
 #!/usr/bin/env node
+/**
+ * @typedef {import("./distribution/types.js").Node} Node
+ */
 
-const util = require('./distribution/util/util.js');
 const log = require('./distribution/util/log.js');
-const args = require('yargs').argv;
 
-// Default configuration
-global.nodeConfig = global.nodeConfig || {
-  ip: '127.0.0.1',
-  port: 1234,
-  onStart: () => {
-    console.log(`Node started!`);
-  },
-};
-
-/*
-You can pass "ip" and "port" arguments directly.
-Use this to startup nodes from the terminal.
-
-Usage:
-./distribution.js --ip '127.0.0.1' --port 1234 # Start node on localhost:1234
-  */
-if (args.ip) {
-  global.nodeConfig.ip = args.ip;
-}
-
-if (args.port) {
-  global.nodeConfig.port = parseInt(args.port);
-}
-
-if (args.config) {
-  const nodeConfig = util.deserialize(args.config);
-  global.nodeConfig.ip = nodeConfig.ip ? nodeConfig.ip : global.nodeConfig.ip;
-  global.nodeConfig.port = nodeConfig.port ?
-        nodeConfig.port : global.nodeConfig.port;
-  global.nodeConfig.onStart = nodeConfig.onStart ?
-        nodeConfig.onStart : global.nodeConfig.onStart;
-}
-
-const distribution = function(config) {
-  if (config) {
-    global.nodeConfig = config;
-    this.nodeConfig = config;
+/**
+ * @param {Node} [config]
+ */
+function bootstrap(config) {
+  if (globalThis.distribution) {
+    log('global.distribution has already been setup');
+    return;
   }
 
-  return global.distribution;
-};
+  // @ts-ignore This is the first time globalThis.distribution is being initialized, so the object does not have all the necessary properties.
+  globalThis.distribution = {};
+  globalThis.distribution.util = require('./distribution/util/util.js');
+  // @ts-ignore node.server is lazily initialized.
+  globalThis.distribution.node = require('./distribution/local/node.js');
+  globalThis.distribution.local = require('./distribution/local/local.js');
 
-// Don't overwrite the distribution object if it already exists
-if (global.distribution === undefined) {
-  global.distribution = distribution;
+  if (config) {
+    globalThis.distribution.node.config = config;
+  }
+
+  for (const [key, service] of Object.entries(globalThis.distribution.local)) {
+    globalThis.distribution.local.routes.put(service, key, () => {});
+  }
+
+  const {setup} = require('./distribution/all/all.js');
+  globalThis.distribution.all = setup({gid: 'all'});
+
+  /* Overrides when missing functionality from previous milestone or extra credit is needed */
+
+  // For M3, when missing RPC, its path through routes, and status.{spawn, stop}
+  /*
+  globalThis.distribution.util.wire.createRPC = require('@brown-ds/distribution').util.wire.createRPC;
+  globalThis.distribution.local.routes.get = require('@brown-ds/distribution').local.routes.get;
+  globalThis.distribution.local.status.spawn = require('@brown-ds/distribution').local.status.spawn;
+  globalThis.distribution.local.status.stop = require('@brown-ds/distribution').local.status.stop;
+  */
 }
 
-distribution.util = require('./distribution/util/util.js');
-distribution.local = require('./distribution/local/local.js');
-distribution.node = require('./distribution/local/node.js');
+/*
+  This logic determines which implementation of the distribution library to use.
+  It can either be:
+  1. The reference implementation from the library @brown-ds/distribution
+  2. Your own, local implementation
 
-for (const key in distribution.local) {
-  distribution.local.routes.put(distribution.local[key], key);
-}
-
-/* Initialize distribution object */
-distribution['all'] = {};
-distribution['all'].status =
-    require('./distribution/all/status')({gid: 'all'});
-distribution['all'].comm =
-    require('./distribution/all/comm')({gid: 'all'});
-distribution['all'].gossip =
-    require('./distribution/all/gossip')({gid: 'all'});
-distribution['all'].groups =
-    require('./distribution/all/groups')({gid: 'all'});
-distribution['all'].routes =
-    require('./distribution/all/routes')({gid: 'all'});
-distribution['all'].mem =
-    require('./distribution/all/mem')({gid: 'all'});
-distribution['all'].store =
-    require('./distribution/all/store')({gid: 'all'});
-
-distribution.node.config = global.nodeConfig;
-module.exports = distribution;
+  Which one to be used by the tests is determined by the value of the property "useLibrary" in the package.json file.
+*/
+// @ts-ignore JSON import resolved at runtime.
+const {useLibrary} = require('./package.json');
+// @ts-ignore Optional dependency for reference implementation.
+const distribution = useLibrary ? require('@brown-ds/distribution') : bootstrap;
 
 /* The following code is run when distribution.js is run directly */
 if (require.main === module) {
-  log(`[node] Starting node with configuration: ${JSON.stringify(global.nodeConfig)}`);
-  distribution.node.start(global.nodeConfig.onStart);
+  distribution();
+  globalThis.distribution.node.start(globalThis.distribution.node.config.onStart || (() => {}));
 }
+
+module.exports = distribution;

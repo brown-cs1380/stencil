@@ -6,13 +6,8 @@ const fs = require('fs');
 const {exit} = require('process');
 
 const identical = (l1, l2) => {
-  // console.log(l1);
-  // console.log(l2);
-
   const term1 = l1.split(/\|/)[0].trim();
   const term2 = l2.split(/\|/)[0].trim();
-  // console.log(term1);
-  // console.log(term2);
 
   if (term1 !== term2) {
     return false;
@@ -20,13 +15,9 @@ const identical = (l1, l2) => {
 
   const fullLine1 = l1.split(/\|/)[1].trim();
   const fullLine2 = l2.split(/\|/)[1].trim();
-  // console.log(fullLine1);
-  // console.log(fullLine2);
 
   const line1 = fullLine1.split(/\s+/);
   const line2 = fullLine2.split(/\s+/);
-  // console.log(line1);
-  // console.log(line2);
 
   if (line1.length !== line2.length) {
     return false;
@@ -40,8 +31,6 @@ const identical = (l1, l2) => {
     pairs1.push({url: line1[i].trim(), count: parseInt(line1[i + 1])});
     pairs2.push({url: line2[i].trim(), count: parseInt(line2[i + 1])});
   }
-  // console.log(pairs1);
-  // console.log(pairs2);
 
   if (pairs1.length !== pairs2.length) {
     return false;
@@ -66,22 +55,21 @@ const identical = (l1, l2) => {
 
   for (const pair of pairs1) {
     if (sets1[pair.count] === undefined) {
-      sets1[pair.count] = new Set([pair.url]);
+      sets1[pair.count] = {};
+      sets1[pair.count][pair.url] = true;
     } else {
-      sets1[pair.count].add(pair.url);
+      sets1[pair.count][pair.url] = true;
     }
   }
 
   for (const pair of pairs2) {
     if (sets2[pair.count] === undefined) {
-      sets2[pair.count] = new Set([pair.url]);
+      sets2[pair.count] = {};
+      sets2[pair.count][pair.url] = true;
     } else {
-      sets2[pair.count].add(pair.url);
+      sets2[pair.count][pair.url] = true;
     }
   }
-
-  // console.dir(sets1, { depth: 100 });
-  // console.dir(sets2, { depth: 100 });
 
   const counts1 = Object.keys(sets1).sort();
   const counts2 = Object.keys(sets2).sort();
@@ -99,12 +87,11 @@ const identical = (l1, l2) => {
   }
 
   for (const count in sets1) {
-    // console.log(`count: ${count}, set: ${sets1[count]}`);
     const s1 = sets1[count];
     const s2 = sets2[count];
 
-    const a1 = [...s1];
-    const a2 = [...s2];
+    const a1 = [...Object.keys(s1)];
+    const a2 = [...Object.keys(s2)];
 
     const sorted1 = a1.sort();
     const sorted2 = a2.sort();
@@ -124,9 +111,6 @@ const identical = (l1, l2) => {
 
   return true;
 };
-
-// console.log(identical(process.argv[2], process.argv[3]));
-
 
 try {
   let wrong = 0;

@@ -1,6 +1,8 @@
-/** @typedef {import("../types").Callback} Callback */
-/** @typedef {import("../types").Node} Node */
-
+// @ts-check
+/**
+ * @typedef {import("../types.js").Callback} Callback
+ * @typedef {import("../types.js").Node} Node
+ */
 
 
 /**
@@ -8,12 +10,13 @@
  * @property {string} service
  * @property {string} method
  * @property {Node} node
+ * @property {string} [gid]
  */
 
 /**
- * @param {Array} message
+ * @param {Array<any>} message
  * @param {Target} remote
- * @param {Callback} [callback]
+ * @param {(error: Error, value?: any) => void} callback
  * @return {void}
  */
 function send(message, remote, callback) {

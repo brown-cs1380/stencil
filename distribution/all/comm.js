@@ -1,29 +1,37 @@
-/** @typedef {import("../types").Callback} Callback */
-
+// @ts-check
 /**
- * NOTE: This Target is slightly different from local.all.Target
- * @typdef {Object} Target
- * @property {string} service
- * @property {string} method
+ * @typedef {import("../types.js").Callback} Callback
+ * @typedef {import("../types.js").Config} Config
  */
 
 /**
- * @param {object} config
- * @return {object}
+ * NOTE: This Target is slightly different from local.all.Target
+ * @typedef {Object} Target
+ * @property {string} service
+ * @property {string} method
+ * @property {string} [gid]
+ *
+ * @typedef {Object} Comm
+ * @property {(message: any[], configuration: Target, callback: Callback) => void} send
+ */
+
+/**
+ * @param {Config} config
+ * @returns {Comm}
  */
 function comm(config) {
   const context = {};
   context.gid = config.gid || 'all';
 
   /**
-   * @param {Array} message
-   * @param {object} configuration
+   * @param {any[]} message
+   * @param {Target} configuration
    * @param {Callback} callback
    */
   function send(message, configuration, callback) {
   }
 
   return {send};
-};
+}
 
 module.exports = comm;

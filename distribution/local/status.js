@@ -1,22 +1,31 @@
+// @ts-check
+/**
+ * @typedef {import("../types.js").Callback} Callback
+ * @typedef {import("../types.js").Node} Node
+ */
 const log = require('../util/log');
 
-const status = {};
+const counts = 0; // TODO: Implement a counter for the number of times the status service has been called
 
-global.moreStatus = {
-  sid: global.distribution.util.id.getSID(global.nodeConfig),
-  nid: global.distribution.util.id.getNID(global.nodeConfig),
-  counts: 0,
-};
-
-status.get = function(configuration, callback) {
-  callback = callback || function() { };
+/**
+ * @param {string} configuration
+ * @param {Callback} callback
+ */
+function get(configuration, callback) {
 };
 
 
-status.spawn = function(configuration, callback) {
-};
+/**
+ * @param {Node} configuration
+ * @param {Callback} callback
+ */
+function spawn(configuration, callback) {
+}
 
-status.stop = function(callback) {
-};
+/**
+ * @param {Callback} callback
+ */
+function stop(callback) {
+}
 
-module.exports = status;
+module.exports = {get, spawn, stop};

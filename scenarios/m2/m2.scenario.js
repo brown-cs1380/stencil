@@ -1,4 +1,5 @@
-const distribution = require('../../config.js');
+require('../../distribution.js')();
+const distribution = globalThis.distribution;
 
 test('(2 pts) (scenario) simple callback practice', () => {
   /* Collect the result of 3 callback services in list  */
@@ -52,15 +53,15 @@ test('(2 pts) (scenario) collect errors and successful results', (done) => {
 
   const doneAndAssert = (es, vs) => {
     try {
-      expect(vs.length).toBe(3);
+      expect(vs.length).toEqual(3);
       expect(vs).toContain('good apples');
       expect(vs).toContain('good bananas');
       expect(vs).toContain('good peaches');
       for (const e of es) {
-        expect(e instanceof Error).toBe(true);
+        expect(e instanceof Error).toEqual(true);
       }
       const messages = es.map((e) => e.message);
-      expect(messages.length).toBe(2);
+      expect(messages.length).toEqual(2);
       expect(messages).toContain('bad pineapples');
       expect(messages).toContain('bad mangoes');
       done();
@@ -101,9 +102,11 @@ test('(5 pts) (scenario) use rpc', (done) => {
     addOne: addOneRPC,
   };
 
-  distribution.node.start((server) => {
+  distribution.node.start(() => {
     function cleanup(callback) {
-      server.close();
+      if (globalThis.distribution.node.server) {
+        globalThis.distribution.node.server.close();
+      }
       distribution.local.comm.send([],
           {node: node, service: 'status', method: 'stop'},
           callback);
@@ -125,9 +128,9 @@ test('(5 pts) (scenario) use rpc', (done) => {
                             {node: node, service: 'addOneService', method: 'addOne'}, (e, v) => {
                               try {
                                 expect(e).toBeFalsy();
-                                expect(v).toBe(3);
+                                expect(v).toEqual(3);
                                 /* The local variable n should also be 3. Remember: The addOne RPC is actually invoking the addOne function locally. */
-                                expect(n).toBe(3);
+                                expect(n).toEqual(3);
                                 cleanup(done);
                               } catch (error) {
                                 cleanup(() => {

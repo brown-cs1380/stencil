@@ -12,10 +12,11 @@ show_usage() {
 Usage: npm test -- [options | pattern]
 
 Pattern:
-  A pattern to match the test files. This can be a substring of the test file name.
-  If no pattern is provided, tests will be run based on the options.
+  The pattern is a substring matched against test file names.
+  Run "npm test -- mN" to run all tests from milestone N.
 
 Options:
+  -a, --all               Run all tests (scenarios, extra credit, and normal tests)
   -s, --scenarios         Run the scenario tests (*.scenario.js)
   -ec, --extra-credit     Run the extra credit tests (*.extra.test.js)
   -t, --tests             Run the normal tests (*.test.js)
@@ -33,6 +34,12 @@ PATTERN=""
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        -a|--all)
+            RUN_SCENARIOS=true
+            RUN_EXTRA_CREDIT=true
+            RUN_NORMAL_TESTS=true
+            shift
+            ;;
         -s|--scenarios)
             RUN_SCENARIOS=true
             shift
@@ -61,7 +68,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Construct the JEST command
-JEST_COMMAND="jest --maxWorkers=1"
+COVERAGE_FLAGS=""
+if [ "${COVERAGE:-}" = "1" ]; then
+    COVERAGE_FLAGS="--coverage --coverageProvider=v8 --coverageDirectory /tmp/coverage --coverageReporters=text --coverageReporters=lcov"
+fi
+JEST_COMMAND="npx jest --maxWorkers=1 $COVERAGE_FLAGS"
 JEST_COMMAND_FLAGS=""
 
 # Add test matching logic
@@ -96,10 +107,10 @@ else
     exit $?
 fi
 
-TOP_LEVEL=$(git rev-parse --show-toplevel)
+top_level=$(git rev-parse --show-toplevel)
 
 # Check if the student is using the reference implementation (useLibrary in package.json is true)
-if [ "$(jq -r '.useLibrary' "$TOP_LEVEL/package.json")" = "true" ]; then
+if [ "$(jq -r '.useLibrary' "$top_level/package.json")" = "true" ]; then
     echo "[test] WARNING: You are using the reference implementation. Make sure to set useLibrary to false in package.json to use your own implementation."
     exit 1
 fi

@@ -3,21 +3,32 @@
     "env": {
         "es6": true, // Enable ES6 syntax including new ES6 globals
         "node": true, // Adjust based on your environment
-        "jest": true
+        "jest": true,
+        "es2020": true
     },
     "parserOptions": {
         "ecmaVersion": 2018, // Update ECMAScript version to at least 6 or later for arrow functions
         "sourceType": "script" // Set to "module" if you are using ES6 modules
     },
+    "plugins": [
+        "n"
+    ],
     "rules": {
+        "valid-jsdoc": "off",
         "max-len": "off",
         "no-undef": "error",
+        "no-restricted-globals": [
+            "error",
+            "Promise"
+        ],
         "prefer-const": "error", // Do not enforce const over let
         "prefer-spread": "off", // Do not enforce spread operator
         "prefer-rest-params": "off", // Do not enforce rest parameters
         "prefer-template": "off", // Do not enforce template literals
         "object-shorthand": "off", // Do not enforce object method shorthand
         "require-jsdoc": "off", // Do not require JSDoc
+        "callback-invocation": "error",
+        "n/callback-return": "error",
         "guard-for-in": "off", // Do not require guard clauses in for...in loops
         "no-restricted-syntax": [
             "error",

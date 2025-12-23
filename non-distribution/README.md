@@ -27,8 +27,8 @@ The code inside `non-distribution` is organized as follows:
 ```
 .
 ├── c            # The components of your search engine
-├── d            # Data files like the index and the crawled pages
-├── s            # Utility scripts for linting and submitting your solutions
+├── d            # Data files like seed urls and the produced index
+├── s            # Utility scripts for linting your solutions
 ├── t            # Tests for your search engine
 ├── README.md    # This file
 ├── crawl.sh     # The crawler

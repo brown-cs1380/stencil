@@ -1,4 +1,5 @@
-const distribution = require('../../config.js');
+require('../../distribution.js')();
+const distribution = globalThis.distribution;
 const id = distribution.util.id;
 
 const ncdcGroup = {};
@@ -14,7 +15,6 @@ const rlgGroup = {};
 /*
     The local node will be the orchestrator.
 */
-let localServer = null;
 
 const n1 = {ip: '127.0.0.1', port: 7110};
 const n2 = {ip: '127.0.0.1', port: 7111};
@@ -51,10 +51,10 @@ test('(0 pts) (scenario) all.mr:ncdc', (done) => {
 
   const expected = [{'1950': 22}, {'1949': 111}];
 
-  const doMapReduce = (cb) => {
+  const doMapReduce = () => {
     distribution.ncdc.store.get(null, (e, v) => {
       try {
-        expect(v.length).toBe(dataset.length);
+        expect(v.length).toEqual(dataset.length);
       } catch (e) {
         done(e);
       }
@@ -121,10 +121,10 @@ test('(10 pts) (scenario) all.mr:dlib', (done) => {
     {'despair,': 1},
   ];
 
-  const doMapReduce = (cb) => {
+  const doMapReduce = () => {
     distribution.dlib.store.get(null, (e, v) => {
       try {
-        expect(v.length).toBe(dataset.length);
+        expect(v.length).toEqual(dataset.length);
       } catch (e) {
         done(e);
       }
@@ -190,10 +190,10 @@ test('(10 pts) (scenario) all.mr:tfidf', (done) => {
     {'are': {'doc3': 0.07}}, {'powers': {'doc2': 0.1}},
     {'and': {'doc3': 0.07}}, {'related': {'doc3': 0.07}}];
 
-  const doMapReduce = (cb) => {
+  const doMapReduce = () => {
     distribution.tfidf.store.get(null, (e, v) => {
       try {
-        expect(v.length).toBe(dataset.length);
+        expect(v.length).toEqual(dataset.length);
       } catch (e) {
         done(e);
       }
@@ -302,9 +302,7 @@ beforeAll((done) => {
     });
   };
 
-  distribution.node.start((server) => {
-    localServer = server;
-
+  distribution.node.start(() => {
     const ncdcConfig = {gid: 'ncdc'};
     startNodes(() => {
       distribution.local.groups.put(ncdcConfig, ncdcGroup, (e, v) => {
@@ -334,11 +332,12 @@ afterAll((done) => {
     distribution.local.comm.send([], remote, (e, v) => {
       remote.node = n3;
       distribution.local.comm.send([], remote, (e, v) => {
-        localServer.close();
+        if (globalThis.distribution.node.server) {
+          globalThis.distribution.node.server.close();
+        }
         done();
       });
     });
   });
 });
-
 

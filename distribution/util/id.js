@@ -1,10 +1,14 @@
-/** @typedef {import("../types.js").Node} Node */
+// @ts-check
+/**
+ * @typedef {import("../types.js").Node} Node
+ * @typedef {import("../types.js").ID} ID
+ * @typedef {import("../types.js").NID} NID
+ * @typedef {import("../types.js").NID} SID
+ * @typedef {import("../types.js").Hasher} Hasher
+ */
 
 const assert = require('assert');
 const crypto = require('crypto');
-
-// The ID is the SHA256 hash of the JSON representation of the object
-/** @typedef {!string} ID */
 
 /**
  * @param {any} obj
@@ -19,7 +23,7 @@ function getID(obj) {
 /**
  * The NID is the SHA256 hash of the JSON representation of the node
  * @param {Node} node
- * @return {ID}
+ * @return {NID}
  */
 function getNID(node) {
   node = {ip: node.ip, port: node.port};
@@ -29,13 +33,16 @@ function getNID(node) {
 /**
  * The SID is the first 5 characters of the NID
  * @param {Node} node
- * @return {ID}
+ * @return {SID}
  */
 function getSID(node) {
   return getNID(node).substring(0, 5);
 }
 
-
+/**
+ * @param {any} message
+ * @returns {string}
+ */
 function getMID(message) {
   const msg = {};
   msg.date = new Date().getTime();
@@ -43,23 +50,33 @@ function getMID(message) {
   return getID(msg);
 }
 
+/**
+ * @param {string} id
+ * @returns {bigint}
+ */
 function idToNum(id) {
-  const n = parseInt(id, 16);
-  assert(!isNaN(n), 'idToNum: id is not in KID form!');
-  return n;
+  assert(typeof id === 'string', 'idToNum: id is not in KID form!');
+  const trimmed = id.startsWith('0x') ? id.slice(2) : id;
+  if (/^[0-9a-fA-F]+$/.test(trimmed)) {
+    return BigInt(`0x${trimmed}`);
+  }
+  return BigInt(id);
 }
 
-function naiveHash(kid, nids) {
+/** @type { Hasher } */
+const naiveHash = (kid, nids) => {
   nids.sort();
-  return nids[idToNum(kid) % nids.length];
-}
+  const index = Number(idToNum(kid) % BigInt(nids.length));
+  return nids[index];
+};
 
-function consistentHash(kid, nids) {
-}
+/** @type { Hasher } */
+const consistentHash = (kid, nids) => {
+};
 
-
-function rendezvousHash(kid, nids) {
-}
+/** @type { Hasher } */
+const rendezvousHash = (kid, nids) => {
+};
 
 module.exports = {
   getID,

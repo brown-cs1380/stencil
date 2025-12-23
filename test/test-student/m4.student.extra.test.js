@@ -5,7 +5,7 @@
     Imporant: Do not modify any of the test headers (i.e., the test('header', ...) part). Doing so will result in grading penalties.
 */
 
-const distribution = require('../../config.js');
+const distribution = require('../../distribution.js');
 
 test('(15 pts) detect the need to reconfigure', (done) => {
     done(new Error('Not implemented'));

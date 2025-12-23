@@ -26,6 +26,6 @@ test('(5 pts) (scenario) 40 bytes object', () => {
     object = "abcdefghijkl";
 
     const serialized = util.serialize(object);
-    expect(serialized.length).toBe(40);
+    expect(serialized.length).toEqual(40);
 });
 ```

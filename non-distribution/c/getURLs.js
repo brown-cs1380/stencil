@@ -2,7 +2,7 @@
 
 /*
 Extract all URLs from a web page.
-Usage: ./getURLs.js <base_url>
+Usage: ./getURLs.js <base_url> < page.html
 */
 
 const readline = require('readline');

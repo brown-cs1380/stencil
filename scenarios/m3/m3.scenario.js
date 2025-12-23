@@ -1,4 +1,5 @@
-const distribution = require('../../config.js');
+require('../../distribution.js')();
+const distribution = globalThis.distribution;
 const id = distribution.util.id;
 
 const n1 = {ip: '127.0.0.1', port: 8000};
@@ -34,15 +35,18 @@ test('(5 pts) (scenario) dynamic group membership', (done) => {
   the updated group membership on all nodes.
 */
   const groupB = {};
-  const initialNodes = [n1, n2];
-  const allNodes = [n1, n2, n3];
+  // Pick some initial nodes...
+  let initialNodes = ['?'];
+  // Pick the final set of nodes...
+  let allNodes = ['?'];
 
   // Create groupB...
+  groupB[id.getSID(n1)] = n1;
 
   const config = {gid: 'groupB'};
 
   // Create the group with initial nodes
-  distribution.local.groups.put(config, initialNodes, (e, v) => {
+  distribution.local.groups.put(config, groupB, (e, v) => {
     // Add a new node dynamically to the group
 
       distribution.groupB.status.get('nid', (e, v) => {
@@ -158,12 +162,8 @@ test('(5 pts) (scenario) use the gossip service', (done) => {
     Do not modify the code below.
 */
 
-let localServer = null;
-
 function startAllNodes(callback) {
-  distribution.node.start((server) => {
-    localServer = server;
-
+  distribution.node.start(() => {
     function startStep(step) {
       if (step >= allNodes.length) {
         callback();
@@ -172,7 +172,7 @@ function startAllNodes(callback) {
 
       distribution.local.status.spawn(allNodes[step], (e, v) => {
         if (e) {
-          callback(e);
+          return callback(e);
         }
         startStep(step + 1);
       });
@@ -199,7 +199,9 @@ function stopAllNodes(callback) {
     }
   }
 
-  if (localServer) localServer.close();
+  if (globalThis.distribution.node.server) {
+    globalThis.distribution.node.server.close();
+  }
   stopStep(0);
 }
 
@@ -213,4 +215,3 @@ beforeAll((done) => {
 afterAll((done) => {
   stopAllNodes(done);
 });
-

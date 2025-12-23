@@ -11,31 +11,31 @@ routes   A mapping from names to functions          get, put
 
 /* Status Service */
 
-const status = require('./status');
+const status = require('./status.js');
 
 /* Groups Service */
 
-const groups = require('./groups');
+const groups = require('./groups.js');
 
 /* Routes Service */
 
-const routes = require('./routes');
+const routes = require('./routes.js');
 
 /* Comm Service */
 
-const comm = require('./comm');
+const comm = require('./comm.js');
 
 /* Gossip Service */
 
-const gossip = require('./gossip');
+const gossip = require('./gossip.js');
 
 /* Mem Service */
 
-const mem = require('./mem');
+const mem = require('./mem.js');
 
 /* Store Service */
 
-const store = require('./store');
+const store = require('./store.js');
 
 module.exports = {
   status: status,

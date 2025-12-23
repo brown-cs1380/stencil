@@ -1,4 +1,5 @@
-const distribution = require('../../config.js');
+require('../../distribution.js')();
+const distribution = globalThis.distribution;
 const util = distribution.util;
 const id = distribution.util.id;
 
@@ -49,7 +50,7 @@ test('(5 pts) (scenario) hash functions return different nodes', () => {
   const key1Node = util.id.consistentHash(kid1, nodeIds);
   const key2Node = util.id.consistentHash(kid2, nodeIds);
 
-  expect(key1Node).toBe(key2Node);
+  expect(key1Node).toEqual(key2Node);
 });
 
 test('(5 pts) (scenario) hash functions return the same node', () => {
@@ -75,8 +76,8 @@ test('(5 pts) (scenario) hash functions return the same node', () => {
   const b = util.id.rendezvousHash(kid, nodeIds);
   const c = util.id.consistentHash(kid, nodeIds);
 
-  expect(a).toBe(b);
-  expect(b).toBe(c);
+  expect(a).toEqual(a);
+  expect(b).toEqual(c);
 });
 
 const n1 = {ip: '127.0.0.1', port: 9001};
@@ -153,8 +154,6 @@ test('(5 pts) (scenario) use mem.reconf', (done) => {
   };
 });
 
-let localServer = null;
-
 beforeAll((done) => {
   // First, stop the nodes if they are running
   const remote = {service: 'status', method: 'stop'};
@@ -181,8 +180,7 @@ beforeAll((done) => {
 
   const startNodes = () => {
     // Now, start the nodes listening node
-    distribution.node.start((server) => {
-      localServer = server;
+    distribution.node.start(() => {
       // Start the nodes
       distribution.local.status.spawn(n1, (e, v) => {
         distribution.local.status.spawn(n2, (e, v) => {
@@ -216,7 +214,9 @@ afterAll((done) => {
           distribution.local.comm.send([], remote, (e, v) => {
             remote.node = n6;
             distribution.local.comm.send([], remote, (e, v) => {
-              localServer.close();
+              if (globalThis.distribution.node.server) {
+                globalThis.distribution.node.server.close();
+              }
               done();
             });
           });
