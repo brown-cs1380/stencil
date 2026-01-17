@@ -22,6 +22,7 @@
         "prefer-template": "off", // Do not enforce template literals
         "object-shorthand": "off", // Do not enforce object method shorthand
         "require-jsdoc": "off", // Do not require JSDoc
+        "object-curly-spacing": "off", // Do not enforce spacing inside curly braces
         "callback-invocation": "error",
         "guard-for-in": "off", // Do not require guard clauses in for...in loops
         "no-restricted-syntax": [
