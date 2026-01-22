@@ -23,6 +23,7 @@ function status(config) {
    * @param {Callback} callback
    */
   function get(configuration, callback) {
+    callback(new Error('status.get not implemented'));
   }
 
   /**

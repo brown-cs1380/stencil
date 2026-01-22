@@ -99,15 +99,25 @@ If you wanted to run this same sequence of commands in a script, you could do so
 ```js
 let distribution = require("@brown-ds/distribution")();
 // Now we're only doing a few of the things we did above
+const out = (cb) => {
+  distribution.local.status.stop(cb); // Shut down the local node
+};
 distribution.node.start(() => {
   // This will run only after the node has started
-  node = { ip: '127.0.0.1', port: 8080 };
-  distribution.local.status.spawn(node, () => {
+  const node = {ip: '127.0.0.1', port: 8765};
+  distribution.local.status.spawn(node, (e, v) => {
+    if (e) {
+      return out(console.log);
+    }
     // This will run only after the new node has been spawned
     distribution.all.status.get('sid', (e, v) => {
-        // This will run only after we communicated with all nodes and got their sids
-        console.log(v); // { '8cf1b': '8cf1b', '8cf1c': '8cf1c' }
-        distribution.local.status.stop(console.log);
+      // This will run only after we communicated with all nodes and got their sids
+      console.log(v); // { '8cf1b': '8cf1b', '8cf1c': '8cf1c' }
+      // Shut down the remote node
+      distribution.local.comm.send([], {service: 'status', method: 'stop', node: node}, () => {
+        // Finally, stop the local node
+        out(console.log); // null, {ip: '127.0.0.1', port: 1380}
+      });
     });
   });
 });

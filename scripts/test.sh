@@ -155,10 +155,16 @@ if [ -n "$PATTERN" ]; then
         MILESTONE="${PATTERN/#s/m}" # sN -> mN
         MATCH_FLAGS+=" --testMatch \"**/*${MILESTONE}*.scenario.js\""
     else
-        # npm test -- mN: run all tests for milestone N
-        MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*test*.js\""
-        MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*.extra.test.js\""
-        MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*.scenario.js\""
+        if [[ "$PATTERN" == *.js ]]; then
+            MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}\""
+        elif [[ "$PATTERN" == *scenario* || "$PATTERN" == *extra* || "$PATTERN" == *test* ]]; then
+            MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*.js\""
+        else
+            # npm test -- mN: run all tests for milestone N
+            MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*test*.js\""
+            MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*.extra.test.js\""
+            MATCH_FLAGS+=" --testMatch \"**/*${PATTERN}*.scenario.js\""
+        fi
     fi
 
     eval "$JEST_COMMAND $MATCH_FLAGS $JEST_COMMAND_FLAGS"

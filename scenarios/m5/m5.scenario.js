@@ -173,6 +173,7 @@ test('(10 pts) (scenario) all.mr:tfidf', (done) => {
 
   // Reduce function: calculate TF-IDF for each word
   const reducer = (key, values) => {
+    const totalDocs = 3;
   };
 
   const dataset = [

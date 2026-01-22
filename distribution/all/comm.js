@@ -29,6 +29,7 @@ function comm(config) {
    * @param {Callback} callback
    */
   function send(message, configuration, callback) {
+    callback(new Error('comm.send not implemented'));
   }
 
   return {send};

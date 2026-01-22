@@ -15,17 +15,17 @@ function bootstrap(config) {
     const distributionLib = require('@brown-ds/distribution')(config);
     distributionLib; // To avoid unused variable warning
   const distribution = {};
+
   // @ts-ignore This is the first time globalThis.distribution is being initialized, so the object does not have all the necessary properties.
   globalThis.distribution = distribution;
   distribution.util = require('./distribution/util/util.js');
 
   // @ts-ignore node.server is lazily initialized.
   distribution.node = require('./distribution/local/node.js');
-  distribution.local = require('./distribution/local/local.js');
-
   if (config) {
     distribution.node.config = config;
   }
+  distribution.local = require('./distribution/local/local.js');
 
   const {setup} = require('./distribution/all/all.js');
   distribution.all = setup({gid: 'all'});
